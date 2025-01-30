@@ -3,8 +3,7 @@ import plotly.express as px
 from functions import load_dataset
 
 
-st.header("Les impacts du changement climatique")
-st.subheader("Le CO²")
+# DATA PREPARATION
 # Load dataset
 df, metadata = load_dataset("annual-co2-including-land-use")
 # Sort dataset by year to correctly animate the graph
@@ -13,6 +12,9 @@ df = df.sort_values(by="Year", ascending=True)
 df = df[df["Code"].notna()]
 df = df[df["Entity"] != "World"]
 
+# PAGE DISPLAY
+st.header("Les impacts du changement climatique")
+st.subheader("Le CO²")
 fig = px.choropleth(
     df,
     locations="Code",
@@ -24,7 +26,6 @@ fig = px.choropleth(
     title="Émissions de CO₂",
     labels={"emissions_total_including_land_use_change": "Émissions CO₂"},
     animation_frame="Year",
-    
 )
 fig.update_layout(transition={"duration": 0}, width=900, height=600)
 st.plotly_chart(fig)
