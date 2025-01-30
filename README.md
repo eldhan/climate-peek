@@ -9,7 +9,7 @@ Le but de ce projet est d'analyser l'impact du changement climatique sur les con
 
 Saisir dans un terminal la commande suivante :
 
-    streamlit run main.py
+    streamlit run app.py
 
 Le site est accessible sur l'URL locale : http://localhost:8501
 
