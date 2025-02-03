@@ -25,21 +25,73 @@ df_full = pd.merge(df_anomalies, df_co2, how="inner", on=["Entity", "Code", "Yea
 
 filter_options = df_full["Entity"].drop_duplicates()
 
+
 # PAGE DISPLAY
 st.header("Mise en évidence du changement climatique ")
-df_filter = st.selectbox(label="Sélectionnez un filtre : ", options=filter_options)
+
+on = st.toggle("Activer le multicolonnes")
+
 st.subheader(
     "Corrélation entre les anomalies de température dans l'atmosphère et de précipitations et les émissions de CO²"
 )
-if df_filter:
-    fig = px.line(
-        df_full[df_full["Entity"] == df_filter],
-        x="Year",
-        y=[
-            "temperature_anomaly",
-            "precipitation_anomaly",
-            "emissions_total_including_land_use_change",
-        ],
-        hover_name="Entity",
-    )
-    st.plotly_chart(fig)
+
+if on:
+    col1, col2 = st.columns(2)
+
+    with col1:
+        filter_options2 = df_full["Entity"].drop_duplicates()
+        df_filter2 = st.selectbox(
+            label="Sélectionnez un filtre : ", options=filter_options2, key="filter2"
+        )
+
+        if df_filter2:
+            fig = px.line(
+                df_full[df_full["Entity"] == df_filter2],
+                x="Year",
+                y=[
+                    "temperature_anomaly",
+                    "precipitation_anomaly",
+                    "emissions_total_including_land_use_change",
+                ],
+                hover_name="Entity",
+            )
+            fig.update_layout(legend=dict(orientation="h", y=-0.2))
+            st.plotly_chart(fig, key="filter22")
+
+    with col2:
+        filter_options3 = df_full["Entity"].drop_duplicates()
+        df_filter3 = st.selectbox(
+            label="Sélectionnez un filtre : ", options=filter_options3, key="filter3"
+        )
+
+        if df_filter3:
+            fig = px.line(
+                df_full[df_full["Entity"] == df_filter3],
+                x="Year",
+                y=[
+                    "temperature_anomaly",
+                    "precipitation_anomaly",
+                    "emissions_total_including_land_use_change",
+                ],
+                hover_name="Entity",
+            )
+            fig.update_layout(legend=dict(orientation="h", y=-0.2))
+
+            st.plotly_chart(fig, key="filter33")
+
+else:
+    filter_options = df_full["Entity"].drop_duplicates()
+    df_filter = st.selectbox(label="Sélectionnez un filtre : ", options=filter_options)
+
+    if df_filter:
+        fig = px.line(
+            df_full[df_full["Entity"] == df_filter],
+            x="Year",
+            y=[
+                "temperature_anomaly",
+                "precipitation_anomaly",
+                "emissions_total_including_land_use_change",
+            ],
+            hover_name="Entity",
+        )
+        st.plotly_chart(fig)
