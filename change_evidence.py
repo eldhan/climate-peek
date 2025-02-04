@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from functions import load_dataset
+from functions import load_dataset, normalize_data
 
 
 # DATA PREPARATION
@@ -23,7 +23,16 @@ df_anomalies = pd.merge(
 )
 df_full = pd.merge(df_anomalies, df_co2, how="inner", on=["Entity", "Code", "Year"])
 
-filter_options = df_full["Entity"].drop_duplicates()
+data_values = [
+    "temperature_anomaly",
+    "precipitation_anomaly",
+    "emissions_total_including_land_use_change",
+]
+
+# Normalize the data
+df = normalize_data(df_full, data_values)
+
+filter_options = df["Entity"].drop_duplicates()
 
 # PAGE DISPLAY
 st.header("Mise en évidence du changement climatique ")
@@ -33,13 +42,8 @@ st.subheader(
 )
 if df_filter:
     fig = px.line(
-        df_full[df_full["Entity"] == df_filter],
+        df[df["Entity"] == df_filter],
         x="Year",
-        y=[
-            "temperature_anomaly",
-            "precipitation_anomaly",
-            "emissions_total_including_land_use_change",
-        ],
-        hover_name="Entity",
+        y=data_values,
     )
     st.plotly_chart(fig)

@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+from sklearn import preprocessing
 
 
 def load_dataset(
@@ -44,3 +45,32 @@ def load_dataset(
         f"https://ourworldindata.org/grapher/{dataset_name}.metadata.json?v={version}&csvType={csvType}&useColumnShortNames={useColumnShortNames}"
     ).json()
     return df, metadata
+
+
+def normalize_data(
+    dataframe,
+    columns_to_normalize: list,
+):
+    """
+    Normalize the data of the columns specified.
+
+    Parameters:
+    ----------
+    dataframe : DataFrame
+        the dataframe containing the data.
+    columns_to_normalize : list
+        a list of string with the names of the DataFrame columns to normalize.
+
+    Returns:
+    ----------
+    df : DataFrame
+        a pandas.DataFrame with the data of the columns specified normalized.
+    """
+    # Create the Scaler object
+    scaler = preprocessing.StandardScaler()
+    # Fit your data on the scaler object
+    scaled_data = scaler.fit_transform(dataframe[columns_to_normalize])
+    scaled_df = pd.DataFrame(scaled_data, columns=columns_to_normalize)
+    df = dataframe.drop(columns=columns_to_normalize)
+    df = pd.merge(df, scaled_df, how="inner", left_index=True, right_index=True)
+    return df
