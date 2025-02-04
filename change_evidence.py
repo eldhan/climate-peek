@@ -28,38 +28,122 @@ filter_options = df["Entity"].drop_duplicates()
 
 # PAGE DISPLAY
 st.header("Mise en évidence du changement climatique ")
-df_filter = st.selectbox(label="Sélectionnez un filtre : ", options=filter_options)
+
+on = st.toggle("Activer le multicolonnes")
+
 st.subheader(
     "Corrélation entre les anomalies de température dans l'atmosphère et de précipitations et les émissions de CO² dans le monde"
 )
 df1 = df[df["Entity"] == "World"]
-df = df[df["Entity"] == df_filter]
-if df_filter:
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig.add_trace(
-        go.Scatter(
-            x=df["Year"],
-            y=df["temperature_anomaly"],
-            name="anomalies de température (degrés)",
-        ),
-        secondary_y=False,
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=df["Year"],
-            y=df["precipitation_anomaly"] / 100,
-            name="anomalies de précipitations (cm)",
-        ),
-        secondary_y=False,
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=df1["Year"],
-            y=df1["emissions_total_including_land_use_change"],
-            name="émissions de co² dans le monde (milliards de tonnes)",
-            line=dict(color="red"),
-        ),
-        secondary_y=True,
-    )
-    fig.update_layout(legend=dict(orientation="h", y=-0.2))
-    st.plotly_chart(fig)
+
+if on:
+    col1, col2 = st.columns(2)
+
+    with col1:
+        filter_options2 = df["Entity"].drop_duplicates()
+        df_filter2 = st.selectbox(
+            label="Sélectionnez un filtre : ", options=filter_options2, key="filter2"
+        )
+
+        if df_filter2:
+            df = df[df["Entity"] == df_filter2]
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+            fig.add_trace(
+                go.Scatter(
+                    x=df["Year"],
+                    y=df["temperature_anomaly"],
+                    name="anomalies de température (degrés)",
+                ),
+                secondary_y=False,
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=df["Year"],
+                    y=df["precipitation_anomaly"] / 100,
+                    name="anomalies de précipitations (cm)",
+                ),
+                secondary_y=False,
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=df1["Year"],
+                    y=df1["emissions_total_including_land_use_change"],
+                    name="émissions de co² dans le monde (milliards de tonnes)",
+                    line=dict(color="red"),
+                ),
+                secondary_y=True,
+            )
+            fig.update_layout(legend=dict(orientation="h", y=-0.2))
+            st.plotly_chart(fig, key="filter22")
+
+    with col2:
+        filter_options3 = df["Entity"].drop_duplicates()
+        df_filter3 = st.selectbox(
+            label="Sélectionnez un filtre : ", options=filter_options3, key="filter3"
+        )
+
+        if df_filter3:
+            df = df[df["Entity"] == df_filter3]
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+            fig.add_trace(
+                go.Scatter(
+                    x=df["Year"],
+                    y=df["temperature_anomaly"],
+                    name="anomalies de température (degrés)",
+                ),
+                secondary_y=False,
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=df["Year"],
+                    y=df["precipitation_anomaly"] / 100,
+                    name="anomalies de précipitations (cm)",
+                ),
+                secondary_y=False,
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=df1["Year"],
+                    y=df1["emissions_total_including_land_use_change"],
+                    name="émissions de co² dans le monde (milliards de tonnes)",
+                    line=dict(color="red"),
+                ),
+                secondary_y=True,
+            )
+            fig.update_layout(legend=dict(orientation="h", y=-0.2))
+            st.plotly_chart(fig, key="filter33")
+
+else:
+    filter_options = df["Entity"].drop_duplicates()
+    df_filter = st.selectbox(label="Sélectionnez un filtre : ", options=filter_options)
+
+    if df_filter:
+        df = df[df["Entity"] == df_filter]
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        fig.add_trace(
+            go.Scatter(
+                x=df["Year"],
+                y=df["temperature_anomaly"],
+                name="anomalies de température (degrés)",
+            ),
+            secondary_y=False,
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=df["Year"],
+                y=df["precipitation_anomaly"] / 100,
+                name="anomalies de précipitations (cm)",
+            ),
+            secondary_y=False,
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=df1["Year"],
+                y=df1["emissions_total_including_land_use_change"],
+                name="émissions de co² dans le monde (milliards de tonnes)",
+                line=dict(color="red"),
+            ),
+            secondary_y=True,
+        )
+        fig.update_layout(legend=dict(orientation="h", y=-0.2))
+        st.plotly_chart(fig)
