@@ -77,7 +77,6 @@ fig2.update_yaxes(title_text="émissions de CO2", secondary_y=False)
 fig2.update_yaxes(title_text="évènements extrêmes", secondary_y=True)
 
 st.plotly_chart(fig2)
-=======
 
 
 # PAGE DISPLAY
