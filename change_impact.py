@@ -16,23 +16,6 @@ df = df[df["Entity"] != "World"]
 
 # PAGE DISPLAY
 st.header("Les impacts du changement climatique")
-st.subheader("Le CO²")
-fig = px.choropleth(
-    df,
-    locations="Code",
-    color="emissions_total_including_land_use_change",
-    range_color=[0, df["emissions_total_including_land_use_change"].max()],
-    hover_name="Entity",
-    color_continuous_scale="YlOrRd",
-    projection="natural earth",
-    title="Émissions de CO₂",
-    labels={"emissions_total_including_land_use_change": "Émissions CO₂"},
-    animation_frame="Year",
-)
-fig.update_layout(transition={"duration": 0}, width=900, height=600)
-st.plotly_chart(fig)
-
-
 
 st.subheader("Les évènements climatiques extrêmes vs les émissions de CO²")
 # Load dataset
@@ -77,9 +60,4 @@ fig2.update_yaxes(title_text="émissions de CO2", secondary_y=False)
 fig2.update_yaxes(title_text="évènements extrêmes", secondary_y=True)
 
 st.plotly_chart(fig2)
-
-
-# PAGE DISPLAY
-st.header("Les impacts du changement climatique")
-st.subheader("Le CO²")
 
