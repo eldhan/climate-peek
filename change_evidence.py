@@ -29,7 +29,7 @@ filter_options = df["Entity"].drop_duplicates()
 # PAGE DISPLAY
 st.header("Mise en évidence du changement climatique ")
 
-on = st.toggle("Activer le multicolonnes")
+on = st.toggle("Comparer deux zones")
 
 st.subheader(
     "Corrélation entre les anomalies de température dans l'atmosphère et de précipitations et les émissions de CO² dans le monde"
@@ -46,20 +46,20 @@ if on:
         )
 
         if df_filter2:
-            df = df[df["Entity"] == df_filter2]
+            df2 = df[df["Entity"] == df_filter2]
             fig = make_subplots(specs=[[{"secondary_y": True}]])
             fig.add_trace(
                 go.Scatter(
-                    x=df["Year"],
-                    y=df["temperature_anomaly"],
+                    x=df2["Year"],
+                    y=df2["temperature_anomaly"],
                     name="anomalies de température (degrés)",
                 ),
                 secondary_y=False,
             )
             fig.add_trace(
                 go.Scatter(
-                    x=df["Year"],
-                    y=df["precipitation_anomaly"] / 100,
+                    x=df2["Year"],
+                    y=df2["precipitation_anomaly"] / 100,
                     name="anomalies de précipitations (cm)",
                 ),
                 secondary_y=False,
@@ -83,20 +83,20 @@ if on:
         )
 
         if df_filter3:
-            df = df[df["Entity"] == df_filter3]
+            df3 = df[df["Entity"] == df_filter3]
             fig = make_subplots(specs=[[{"secondary_y": True}]])
             fig.add_trace(
                 go.Scatter(
-                    x=df["Year"],
-                    y=df["temperature_anomaly"],
+                    x=df3["Year"],
+                    y=df3["temperature_anomaly"],
                     name="anomalies de température (degrés)",
                 ),
                 secondary_y=False,
             )
             fig.add_trace(
                 go.Scatter(
-                    x=df["Year"],
-                    y=df["precipitation_anomaly"] / 100,
+                    x=df3["Year"],
+                    y=df3["precipitation_anomaly"] / 100,
                     name="anomalies de précipitations (cm)",
                 ),
                 secondary_y=False,
@@ -118,20 +118,20 @@ else:
     df_filter = st.selectbox(label="Sélectionnez un filtre : ", options=filter_options)
 
     if df_filter:
-        df = df[df["Entity"] == df_filter]
+        df0 = df[df["Entity"] == df_filter]
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         fig.add_trace(
             go.Scatter(
-                x=df["Year"],
-                y=df["temperature_anomaly"],
+                x=df0["Year"],
+                y=df0["temperature_anomaly"],
                 name="anomalies de température (degrés)",
             ),
             secondary_y=False,
         )
         fig.add_trace(
             go.Scatter(
-                x=df["Year"],
-                y=df["precipitation_anomaly"] / 100,
+                x=df0["Year"],
+                y=df0["precipitation_anomaly"] / 100,
                 name="anomalies de précipitations (cm)",
             ),
             secondary_y=False,
