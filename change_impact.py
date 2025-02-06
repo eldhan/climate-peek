@@ -70,3 +70,50 @@ fig.update_yaxes(title_text="émissions de CO2", secondary_y=False)
 fig.update_yaxes(title_text="évènements extrêmes", secondary_y=True)
 
 st.plotly_chart(fig)
+
+
+# Chargement des données
+df_gaz = pd.read_csv("datasets/global-warming-by-gas-and-source.csv")
+
+# Garder uniquement les données mondiales
+df_gaz = df_gaz[df_gaz["Entity"] == "World"]
+
+# Sélectionner les colonnes des émissions
+gas_columns = df_gaz.columns[3:]  # Exclure 'Entity', 'Code' et 'Year'
+
+# PAGE DISPLAY
+st.header("Impact des gaz à effet de serre sur le réchauffement climatique")
+st.subheader("Évolution de l'augmentation de la température mondiale")
+
+# Traduction des légendes
+translations = {
+    "Change in global mean surface temperature caused by nitrous oxide emissions from fossil fuels and industry": "N₂O - Industrie",
+    "Change in global mean surface temperature caused by nitrous oxide emissions from agriculture and land use": "N₂O - Agriculture",
+    "Change in global mean surface temperature caused by methane emissions from fossil fuels and industry": "CH₄ - Industrie",
+    "Change in global mean surface temperature caused by methane emissions from agriculture and land use": "CH₄ - Agriculture",
+    "Change in global mean surface temperature caused by CO₂ emissions from fossil fuels and industry": "CO₂ - Industrie",
+    "Change in global mean surface temperature caused by CO₂ emissions from agriculture and land use": "CO₂ - Agriculture",
+}
+
+# Appliquer les traductions aux colonnes
+df_gaz.rename(columns=translations, inplace=True)
+translated_columns = list(translations.values())  # Liste des nouvelles légendes
+
+# figure Plotly
+fig = go.Figure()
+
+# Ajouter chaque type d'émission avec les noms traduits
+for gas in translated_columns:
+    fig.add_trace(go.Scatter(x=df_gaz["Year"], y=df_gaz[gas], mode="lines", name=gas))
+
+# Personnalisation du graphique
+fig.update_layout(
+    title_text="Évolution de l'impact des gaz à effet de serre sur la température mondiale",
+    xaxis_title="Année",
+    yaxis_title="Changement de température (°C)",
+    legend_title="Types d'émissions",
+    legend=dict(orientation="h", y=-0.2),
+)
+
+# Affichage du graphique
+st.plotly_chart(fig)
