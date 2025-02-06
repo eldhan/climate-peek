@@ -9,6 +9,9 @@ st.write(
     "Analyse de l'impact du changement climatique sur les conditions météorologiques à travers le monde et mise en évidence des tendances de pollution de l'air dans différentes régions."
 )
 
+st.markdown("""
+Certains gaz présents dans l’atmosphère, comme le CO2, la vapeur d’eau ou encore le méthane, retiennent la chaleur du soleil, et sans eux, la température moyenne de la planète serait de -18°C ! C’est ce qu’on appelle **l’effet de serre**, et on nomme ces gaz les GES (Gaz à Effet de Serre). Le problème, c’est que les activités humaines telles que la combustion du gaz, du pétrole, la déforestation, etc, émettent énormément de GES. Depuis 1850, la température moyenne de la planète a augmenté de plus de 1°C ! Le CO² représente à lui seul les **⅔ des émissions** de GES.
+""")
 
 # DATA PREPARATION
 # Load dataset
