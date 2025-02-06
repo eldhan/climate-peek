@@ -15,7 +15,7 @@ Certains gaz présents dans l’atmosphère, comme le CO2, la vapeur d’eau ou 
 
 # DATA PREPARATION
 # Load dataset
-df = pd.read_csv("datasets/annual-co2-including-land-use.csv")
+df = pd.read_csv("datasets/total-ghg-emissions.csv")
 # Sort dataset by year to correctly animate the graph
 df = df.sort_values(by="Year", ascending=True)
 # Remove aggregated categories from the dataframe
@@ -26,13 +26,15 @@ df = df[df["Entity"] != "World"]
 fig = px.choropleth(
     df,
     locations="Code",
-    color="Annual CO₂ emissions including land-use change",
-    range_color=[0, df["Annual CO₂ emissions including land-use change"].max()],
+    color="Annual greenhouse gas emissions in CO₂ equivalents",
+    range_color=[5e6, 8e9],
     hover_name="Entity",
     color_continuous_scale="YlOrRd",
     projection="natural earth",
-    title="Émissions de CO₂",
-    labels={"Annual CO₂ emissions including land-use change": "Émissions CO₂"},
+    title="Émissions GES",
+    labels={
+        "Annual greenhouse gas emissions in CO₂ equivalents": "Émissions GES (équivalent CO₂)"
+    },
     animation_frame="Year",
 )
 fig.update_layout(transition={"duration": 0}, width=900, height=600)
