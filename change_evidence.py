@@ -2,18 +2,13 @@ import streamlit as st
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
-from functions import load_dataset
 
 
 # DATA PREPARATION
 # Load datasets required for graph comparisons
-df_temperature_anomaly, metadata_temperature_anomaly = load_dataset(
-    "annual-temperature-anomalies"
-)
-df_precipation_anomaly, metadata_precipation_anomaly = load_dataset(
-    "global-precipitation-anomaly"
-)
-df_co2, metadata_co2 = load_dataset("annual-co2-including-land-use")
+df_temperature_anomaly = pd.read_csv("datasets/annual-temperature-anomalies.csv")
+df_precipation_anomaly = pd.read_csv("datasets/global-precipitation-anomaly.csv")
+df_co2 = pd.read_csv("datasets/annual-co2-including-land-use.csv")
 
 # Merge the datasets together to display them on the same graph
 df_anomalies = pd.merge(
@@ -51,7 +46,7 @@ if on:
             fig.add_trace(
                 go.Scatter(
                     x=df2["Year"],
-                    y=df2["temperature_anomaly"],
+                    y=df2["Temperature anomaly"],
                     name="anomalies de température (degrés)",
                 ),
                 secondary_y=False,
@@ -59,7 +54,7 @@ if on:
             fig.add_trace(
                 go.Scatter(
                     x=df2["Year"],
-                    y=df2["precipitation_anomaly"] / 100,
+                    y=df2["Annual precipitation anomaly"] / 100,
                     name="anomalies de précipitations (cm)",
                 ),
                 secondary_y=False,
@@ -67,7 +62,7 @@ if on:
             fig.add_trace(
                 go.Scatter(
                     x=df1["Year"],
-                    y=df1["emissions_total_including_land_use_change"],
+                    y=df1["Annual CO₂ emissions including land-use change"],
                     name="émissions de co² dans le monde (milliards de tonnes)",
                     line=dict(color="red"),
                 ),
@@ -88,7 +83,7 @@ if on:
             fig.add_trace(
                 go.Scatter(
                     x=df3["Year"],
-                    y=df3["temperature_anomaly"],
+                    y=df3["Temperature anomaly"],
                     name="anomalies de température (degrés)",
                 ),
                 secondary_y=False,
@@ -96,7 +91,7 @@ if on:
             fig.add_trace(
                 go.Scatter(
                     x=df3["Year"],
-                    y=df3["precipitation_anomaly"] / 100,
+                    y=df3["Annual precipitation anomaly"] / 100,
                     name="anomalies de précipitations (cm)",
                 ),
                 secondary_y=False,
@@ -104,7 +99,7 @@ if on:
             fig.add_trace(
                 go.Scatter(
                     x=df1["Year"],
-                    y=df1["emissions_total_including_land_use_change"],
+                    y=df1["Annual CO₂ emissions including land-use change"],
                     name="émissions de co² dans le monde (milliards de tonnes)",
                     line=dict(color="red"),
                 ),
@@ -123,7 +118,7 @@ else:
         fig.add_trace(
             go.Scatter(
                 x=df0["Year"],
-                y=df0["temperature_anomaly"],
+                y=df0["Temperature anomaly"],
                 name="anomalies de température (degrés)",
             ),
             secondary_y=False,
@@ -131,7 +126,7 @@ else:
         fig.add_trace(
             go.Scatter(
                 x=df0["Year"],
-                y=df0["precipitation_anomaly"] / 100,
+                y=df0["Annual precipitation anomaly"] / 100,
                 name="anomalies de précipitations (cm)",
             ),
             secondary_y=False,
@@ -139,7 +134,7 @@ else:
         fig.add_trace(
             go.Scatter(
                 x=df1["Year"],
-                y=df1["emissions_total_including_land_use_change"],
+                y=df1["Annual CO₂ emissions including land-use change"],
                 name="émissions de co² dans le monde (milliards de tonnes)",
                 line=dict(color="red"),
             ),
