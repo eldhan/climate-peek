@@ -1,4 +1,5 @@
 import streamlit as st
+from functions import check_datasets
 
 
 def load_css(file_name: str) -> None:
@@ -41,5 +42,13 @@ with st.sidebar:
 # Apply css
 css = "assets/style.css"
 load_css(css)
+# List of datasets
+DATASETS = [
+    "annual-co2-including-land-use",
+    "annual-temperature-anomalies",
+    "global-precipitation-anomaly",
+    "number-of-natural-disaster-events",
+]
+check_datasets(DATASETS)
 # Start the app
 pg.run()
