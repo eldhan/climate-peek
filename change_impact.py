@@ -3,6 +3,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 from functions import get_dataset
+import pycountry
+import gettext
 
 
 st.header("Les impacts du changement climatique")
@@ -28,13 +30,20 @@ if (
         on=["Entity", "Code", "Year"],
     )
     df = pd.merge(df_anomalies, df_co2, how="inner", on=["Entity", "Code", "Year"])
+    country_translation = {}
+    french = gettext.translation("iso3166-1", pycountry.LOCALES_DIR, languages=["fr"])
+    french.install()
+    for country in pycountry.countries:
+        country_translation[country.name] = _(country.name)
 
+    df["Entity_FR"] = df["Entity"].map(country_translation).fillna(df["Entity"])
+    df["Entity_FR"] = df["Entity_FR"].replace(to_replace={"World": "Monde", "North Korea": "Corée du Nord", "Democratic Republic of Congo": "République démocratique du Congo"})
     # Prepare filters
-    filter_options = df["Entity"].drop_duplicates()
+    filter_options = df["Entity_FR"].drop_duplicates()
     world_index = 175
 
     # Dataframe for world values only
-    df1 = df[df["Entity"] == "World"]
+    df1 = df[df["Entity_FR"] == "Monde"]
 
     # PAGE DISPLAY
     on = st.toggle("Comparer deux zones")
@@ -48,7 +57,7 @@ if (
             label="Sélectionnez un filtre : ", options=filter_options, index=world_index
         )
         if df_filter:
-            df0 = df[df["Entity"] == df_filter]
+            df0 = df[df["Entity_FR"] == df_filter]
             fig = make_subplots(specs=[[{"secondary_y": True}]])
             fig.add_trace(
                 go.Scatter(
@@ -86,7 +95,7 @@ if (
                 index=world_index,
             )
             if df_filter:
-                df2 = df[df["Entity"] == df_filter]
+                df2 = df[df["Entity_FR"] == df_filter]
                 fig = make_subplots(specs=[[{"secondary_y": True}]])
                 fig.add_trace(
                     go.Scatter(
@@ -122,7 +131,7 @@ if (
             )
 
             if df_filter:
-                df2 = df[df["Entity"] == df_filter]
+                df2 = df[df["Entity_FR"] == df_filter]
                 fig = make_subplots(specs=[[{"secondary_y": True}]])
                 fig.add_trace(
                     go.Scatter(
@@ -172,7 +181,15 @@ if dataset_disasters != "error":
         | (df2["Entity"] == "Extreme temperature")
         | (df2["Entity"] == "Extreme weather")
     ]
-
+    df2["Entity"] = df2["Entity"].replace(
+        {
+            "Flood": "Inondations",
+            "Drought": "Sécheresse",
+            "Wildfire": "Feux de forêt",
+            "Extreme temperature": "Températures extrêmes",
+            "Extreme weather": "Climat extrême",
+        }
+    )
     st.subheader("Les évènements climatiques extrêmes vs les émissions de CO²")
 
     df_filter = st.selectbox(

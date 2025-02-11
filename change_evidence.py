@@ -11,7 +11,7 @@ st.write(
     "L'augmentation des émissions de gaz à effet de serre est fortement liée aux activités humaines."
 )
 
-# CORRELATION ENTRE LES EMISSIONS DE CO2 ET LES ACTIVITES HUMAINES
+# CORRELATION ENTRE LES EMISSIONS DE CO₂ ET LES ACTIVITES HUMAINES
 # Chargement des données
 dataset_gaz = get_dataset("global-warming-by-gas-and-source")
 if dataset_gaz != "error":
@@ -24,7 +24,6 @@ if dataset_gaz != "error":
     gas_columns = df_gaz.columns[3:]  # Exclure 'Entity', 'Code' et 'Year'
 
     # PAGE DISPLAY
-
     st.subheader("Les sources d'émissions des GES")
 
     # Traduction des légendes
@@ -67,7 +66,7 @@ else:
 # Ajouter un espace entre les paragraphes
 st.markdown("<br><br>", unsafe_allow_html=True)
 
-# CORRELATION ENTRE LA DEFORESTATION ET LES EMISSIONS DE CO2
+# CORRELATION ENTRE LA DEFORESTATION ET LES EMISSIONS DE CO₂
 st.subheader("La perte de surfaces boisées")
 
 dataset_co2 = get_dataset("annual-co2-including-land-use")
@@ -90,7 +89,7 @@ if dataset_co2 != "error" and dataset_forest != "error":
         go.Scatter(
             x=df_co2["Year"],
             y=df_co2["Annual CO₂ emissions including land-use change"],
-            name="émissions de co² mondiales",
+            name="émissions de CO₂ mondiales",
             line=dict(color="blue"),
         ),
         secondary_y=False,
@@ -109,7 +108,7 @@ if dataset_co2 != "error" and dataset_forest != "error":
 
     # Add figure title
     fig2.update_layout(
-        title_text="Évolution de la perte mondiale de surfaces boisées vs les émissions de CO² mondiales",
+        title_text="Évolution de la perte mondiale de surfaces boisées vs les émissions de CO₂ mondiales",
         legend=dict(orientation="h", y=-0.2),
     )
 
@@ -117,7 +116,7 @@ if dataset_co2 != "error" and dataset_forest != "error":
     fig2.update_xaxes(title_text="Année")
 
     # Set y-axes titles
-    fig2.update_yaxes(title_text="émissions de CO2", secondary_y=False)
+    fig2.update_yaxes(title_text="émissions de CO₂", secondary_y=False)
     fig2.update_yaxes(title_text="perte de surfaces boisées", secondary_y=True)
 
     st.plotly_chart(fig2)
