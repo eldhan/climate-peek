@@ -173,3 +173,5 @@ cython_debug/
 # Streamlit configuration folder
 .streamlit/
 
+# Datasets
+datasets/
