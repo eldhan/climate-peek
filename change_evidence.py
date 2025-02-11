@@ -2,142 +2,123 @@ import streamlit as st
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
+from functions import get_dataset
 
 
-# DATA PREPARATION
-# Load datasets required for graph comparisons
-df_temperature_anomaly = pd.read_csv("datasets/annual-temperature-anomalies.csv")
-df_precipation_anomaly = pd.read_csv("datasets/global-precipitation-anomaly.csv")
-df_co2 = pd.read_csv("datasets/annual-co2-including-land-use.csv")
+st.header("Les causes de l'augmentation de l'effet de serre")
 
-# Merge the datasets together to display them on the same graph
-df_anomalies = pd.merge(
-    df_temperature_anomaly,
-    df_precipation_anomaly,
-    how="inner",
-    on=["Entity", "Code", "Year"],
-)
-df = pd.merge(df_anomalies, df_co2, how="inner", on=["Entity", "Code", "Year"])
-
-# Prepare filters
-filter_options = df["Entity"].drop_duplicates()
-world_index = 175
-
-# Dataframe for world values only
-df1 = df[df["Entity"] == "World"]
-
-# PAGE DISPLAY
-st.header("Mise en évidence du changement climatique ")
-
-on = st.toggle("Comparer deux zones")
-
-st.subheader(
-    "Corrélation entre les anomalies de température dans l'atmosphère et de précipitations et les émissions de CO² dans le monde"
+st.write(
+    "L'augmentation des émissions de gaz à effet de serre est fortement liée aux activités humaines."
 )
 
-if not on:
-    df_filter = st.selectbox(
-        label="Sélectionnez un filtre : ", options=filter_options, index=world_index
+# CORRELATION ENTRE LES EMISSIONS DE CO₂ ET LES ACTIVITES HUMAINES
+# Chargement des données
+dataset_gaz = get_dataset("global-warming-by-gas-and-source")
+if dataset_gaz != "error":
+    df_gaz = pd.read_csv(f"datasets/{dataset_gaz}")
+
+    # Garder uniquement les données mondiales
+    df_gaz = df_gaz[df_gaz["Entity"] == "World"]
+
+    # Sélectionner les colonnes des émissions
+    gas_columns = df_gaz.columns[3:]  # Exclure 'Entity', 'Code' et 'Year'
+
+    # PAGE DISPLAY
+    st.subheader("Les sources d'émissions des GES")
+
+    # Traduction des légendes
+    translations = {
+        "Change in global mean surface temperature caused by nitrous oxide emissions from fossil fuels and industry": "N₂O - Industrie",
+        "Change in global mean surface temperature caused by nitrous oxide emissions from agriculture and land use": "N₂O - Agriculture",
+        "Change in global mean surface temperature caused by methane emissions from fossil fuels and industry": "CH₄ - Industrie",
+        "Change in global mean surface temperature caused by methane emissions from agriculture and land use": "CH₄ - Agriculture",
+        "Change in global mean surface temperature caused by CO₂ emissions from fossil fuels and industry": "CO₂ - Industrie",
+        "Change in global mean surface temperature caused by CO₂ emissions from agriculture and land use": "CO₂ - Agriculture",
+    }
+
+    # Appliquer les traductions aux colonnes
+    df_gaz.rename(columns=translations, inplace=True)
+    translated_columns = list(translations.values())  # Liste des nouvelles légendes
+
+    # figure Plotly
+    fig = go.Figure()
+
+    # Ajouter chaque type d'émission avec les noms traduits
+    for gas in translated_columns:
+        fig.add_trace(
+            go.Scatter(x=df_gaz["Year"], y=df_gaz[gas], mode="lines", name=gas)
+        )
+
+    # Personnalisation du graphique
+    fig.update_layout(
+        title_text="Évolution de la température mondiale en fonction des GES",
+        xaxis_title="Année",
+        yaxis_title="Changement de température (°C)",
+        legend_title="Types d'émissions",
+        legend=dict(orientation="h", y=-0.2),
     )
-    if df_filter:
-        df0 = df[df["Entity"] == df_filter]
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
-        fig.add_trace(
-            go.Scatter(
-                x=df0["Year"],
-                y=df0["Temperature anomaly"],
-                name="anomalies de température (degrés)",
-            ),
-            secondary_y=False,
-        )
-        fig.add_trace(
-            go.Scatter(
-                x=df0["Year"],
-                y=df0["Annual precipitation anomaly"] / 100,
-                name="anomalies de précipitations (cm)",
-            ),
-            secondary_y=False,
-        )
-        fig.add_trace(
-            go.Scatter(
-                x=df1["Year"],
-                y=df1["Annual CO₂ emissions including land-use change"],
-                name="émissions de co² dans le monde (milliards de tonnes)",
-                line=dict(color="red"),
-            ),
-            secondary_y=True,
-        )
-        fig.update_layout(legend=dict(orientation="h", y=-0.2))
-        st.plotly_chart(fig)
+
+    # Affichage du graphique
+    st.plotly_chart(fig)
 else:
-    col1, col2 = st.columns(2)
-    with col1:
-        df_filter = st.selectbox(
-            label="Sélectionnez un filtre : ", options=filter_options, index=world_index
-        )
-        if df_filter:
-            df2 = df[df["Entity"] == df_filter]
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            fig.add_trace(
-                go.Scatter(
-                    x=df2["Year"],
-                    y=df2["Temperature anomaly"],
-                    name="anomalies de température (degrés)",
-                ),
-                secondary_y=False,
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=df2["Year"],
-                    y=df2["Annual precipitation anomaly"] / 100,
-                    name="anomalies de précipitations (cm)",
-                ),
-                secondary_y=False,
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=df1["Year"],
-                    y=df1["Annual CO₂ emissions including land-use change"],
-                    name="émissions de co² dans le monde (milliards de tonnes)",
-                    line=dict(color="red"),
-                ),
-                secondary_y=True,
-            )
-            fig.update_layout(legend=dict(orientation="h", y=-0.2))
-            st.plotly_chart(fig, key="filter11")
+    st.write("Une erreur a été rencontré")
 
-    with col2:
-        df_filter2 = st.selectbox(
-            label="Sélectionnez un filtre : ", options=filter_options, key="filter2"
-        )
+# Ajouter un espace entre les paragraphes
+st.markdown("<br><br>", unsafe_allow_html=True)
 
-        if df_filter:
-            df2 = df[df["Entity"] == df_filter]
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            fig.add_trace(
-                go.Scatter(
-                    x=df2["Year"],
-                    y=df2["Temperature anomaly"],
-                    name="anomalies de température (degrés)",
-                ),
-                secondary_y=False,
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=df2["Year"],
-                    y=df2["Annual precipitation anomaly"] / 100,
-                    name="anomalies de précipitations (cm)",
-                ),
-                secondary_y=False,
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=df1["Year"],
-                    y=df1["Annual CO₂ emissions including land-use change"],
-                    name="émissions de co² dans le monde (milliards de tonnes)",
-                    line=dict(color="red"),
-                ),
-                secondary_y=True,
-            )
-            fig.update_layout(legend=dict(orientation="h", y=-0.2))
-            st.plotly_chart(fig, key="filter22")
+# CORRELATION ENTRE LA DEFORESTATION ET LES EMISSIONS DE CO₂
+st.subheader("La perte de surfaces boisées")
+
+dataset_co2 = get_dataset("annual-co2-including-land-use")
+dataset_forest = get_dataset("tree-cover-loss")
+if dataset_co2 != "error" and dataset_forest != "error":
+    df_co2 = pd.read_csv(f"datasets/{dataset_co2}")
+    df_forest = pd.read_csv(f"datasets/{dataset_forest}")
+
+    # on ne garde que les données mondiales
+    df_co2 = df_co2[df_co2["Entity"] == "World"]
+    df_forest = df_forest[df_forest["Entity"] == "World"]
+
+    df_co2 = df_co2.drop(df_co2[df_co2["Year"] < 2001].index)
+
+    # Create figure with secondary y-axis
+    fig2 = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # Add traces
+    fig2.add_trace(
+        go.Scatter(
+            x=df_co2["Year"],
+            y=df_co2["Annual CO₂ emissions including land-use change"],
+            name="émissions de CO₂ mondiales",
+            line=dict(color="blue"),
+        ),
+        secondary_y=False,
+    )
+
+    fig2.add_trace(
+        go.Scatter(
+            x=df_forest["Year"],
+            y=df_forest["Total tree cover loss"],
+            name="perte annuelle mondiale de surfaces boisées",
+            mode="lines",
+            line=dict(color="red"),
+        ),
+        secondary_y=True,
+    )
+
+    # Add figure title
+    fig2.update_layout(
+        title_text="Évolution de la perte mondiale de surfaces boisées vs les émissions de CO₂ mondiales",
+        legend=dict(orientation="h", y=-0.2),
+    )
+
+    # Set x-axis title
+    fig2.update_xaxes(title_text="Année")
+
+    # Set y-axes titles
+    fig2.update_yaxes(title_text="émissions de CO₂", secondary_y=False)
+    fig2.update_yaxes(title_text="perte de surfaces boisées", secondary_y=True)
+
+    st.plotly_chart(fig2)
+else:
+    st.write("Une erreur a été rencontré")

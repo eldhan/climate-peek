@@ -172,3 +172,4 @@ cython_debug/
 
 # Streamlit configuration folder
 .streamlit/
+
