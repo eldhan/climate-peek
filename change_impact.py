@@ -8,6 +8,9 @@ import gettext
 
 
 st.header("Les impacts du changement climatique")
+st.subheader(
+    "Corrélation entre les anomalies de température dans l'atmosphère et de précipitations et les émissions de CO² dans le monde"
+)
 # DATA PREPARATION
 # Load datasets required for graph comparisons
 dataset_temperature = get_dataset("annual-temperature-anomalies")
@@ -47,10 +50,6 @@ if (
 
     # PAGE DISPLAY
     on = st.toggle("Comparer deux zones")
-
-    st.subheader(
-        "Corrélation entre les anomalies de température dans l'atmosphère et de précipitations et les émissions de CO² dans le monde"
-    )
 
     if not on:
         df_filter = st.selectbox(
@@ -163,11 +162,12 @@ if (
 else:
     st.write("Une erreur a été rencontré")
     # Ajouter un espace entre les paragraphes
-st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<br><br>", unsafe_allow_html=True) 
 
+st.subheader("Les évènements climatiques extrêmes vs les émissions de CO²")
 # Load dataset
 dataset_disasters = get_dataset("number-of-natural-disaster-events")
-if dataset_disasters != "error":
+if dataset_disasters != "error" and dataset_co2 != "error":
     df2 = pd.read_csv(f"datasets/{dataset_disasters}")
 
     # Remove aggregated categories from the dataframe
@@ -190,7 +190,6 @@ if dataset_disasters != "error":
             "Extreme weather": "Climat extrême",
         }
     )
-    st.subheader("Les évènements climatiques extrêmes vs les émissions de CO²")
 
     df_filter = st.selectbox(
         label="Sélectionnez un évènement climatique : ",
@@ -238,7 +237,7 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 st.subheader("La montée du niveau des océans")
 
 dataset_sea_levels = get_dataset("sea-level")
-if dataset_sea_levels != "error":
+if dataset_sea_levels != "error" and dataset_co2 != "error":
     df3 = pd.read_csv(f"datasets/{dataset_sea_levels}")
     df3["Day"] = pd.to_datetime(df3["Day"])
     df3["Year"] = df3["Day"].dt.year
@@ -293,7 +292,7 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # TEMPERATURE DES OCEANS
 st.subheader("L'augmentation de la température des océans")
 dataset_sea_surface = get_dataset("sea-surface-temperature-anomaly")
-if dataset_sea_surface != "error":
+if dataset_sea_surface != "error" and dataset_co2 != "error":
     # on transforme les dates en années
     df4 = pd.read_csv(f"datasets/{dataset_sea_surface}")
 
@@ -348,7 +347,7 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # ACIFIFICATION
 st.subheader("L'acidification des océans")
 dataset_seawaterph = get_dataset("seawater-ph")
-if dataset_seawaterph != "error":
+if dataset_seawaterph != "error" and dataset_co2 != "error":
     df5 = pd.read_csv(f"datasets/{dataset_seawaterph}")
 
     # on transforme les dates en années
@@ -406,7 +405,7 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 st.subheader("La fonte des glaces")
 
 dataset_icesheet = get_dataset("ice-sheet-mass-balance")
-if dataset_icesheet != "error":
+if dataset_icesheet != "error" and dataset_co2 != "error":
     df6 = pd.read_csv(f"datasets/{dataset_icesheet}")
 
     # on transforme les dates en années

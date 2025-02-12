@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from functions import get_dataset
+from functions import get_dataset, check_datasets
 
 
 st.header("Climate Peek")
@@ -15,7 +15,21 @@ st.markdown(
 Certains gaz présents dans l’atmosphère, comme le CO2, la vapeur d’eau ou encore le méthane, retiennent la chaleur du soleil, et sans eux, la température moyenne de la planète serait de -18°C ! C’est ce qu’on appelle **l’effet de serre**, et on nomme ces gaz les GES (Gaz à Effet de Serre). Le problème, c’est que les activités humaines telles que la combustion du gaz, du pétrole, la déforestation, etc, émettent énormément de GES. Depuis 1850, la température moyenne de la planète a augmenté de plus de 1°C ! Le CO² représente à lui seul les **⅔ des émissions** de GES.
 """
 )
-
+# List of datasets
+DATASETS = [
+    "total-ghg-emissions",
+    "annual-co2-including-land-use",
+    "annual-temperature-anomalies",
+    "global-precipitation-anomaly",
+    "number-of-natural-disaster-events",
+    "global-warming-by-gas-and-source",
+    "ice-sheet-mass-balance",
+    "sea-level",
+    "sea-surface-temperature-anomaly",
+    "seawater-ph",
+    "tree-cover-loss",
+]
+check_datasets(DATASETS)
 # Load dataset
 dataset_ghg = get_dataset("total-ghg-emissions")
 if dataset_ghg != "error":
