@@ -7,9 +7,10 @@ from functions import get_dataset
 
 st.header("Les causes de l'augmentation de l'effet de serre")
 
-st.write(
+st.markdown(
     "L'augmentation des émissions de gaz à effet de serre est fortement liée aux activités humaines."
 )
+st.markdown("<br>", unsafe_allow_html=True)
 
 # CORRELATION ENTRE LES EMISSIONS DE CO₂ ET LES ACTIVITES HUMAINES
 # Chargement des données
@@ -40,6 +41,19 @@ if dataset_gaz != "error":
     df_gaz.rename(columns=translations, inplace=True)
     translated_columns = list(translations.values())  # Liste des nouvelles légendes
 
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.markdown(
+            "Les émissions mondiales de GES proviennent principalement de la production d’énergie, qui repose encore largement sur les combustibles fossiles (charbon, pétrole, gaz)."
+        )
+        st.markdown(
+            "Le secteur des transports contribue également de manière significative, notamment à travers l’aviation et le transport routier. L'industrie, avec la fabrication du ciment, de l'acier et des produits chimiques, joue aussi un rôle clé dans ces rejets. Enfin, l’agriculture participe à l’augmentation des GES, notamment par la production de méthane issue de l’élevage."
+        )
+
+    with col2:
+
+        st.image("assets/usine.jpg")
     # figure Plotly
     fig = go.Figure()
 
@@ -68,6 +82,21 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 
 # CORRELATION ENTRE LA DEFORESTATION ET LES EMISSIONS DE CO₂
 st.subheader("La perte de surfaces boisées")
+
+col1, col2 = st.columns([1, 2])
+
+with col1:
+    st.image("assets/foret.jpg")
+
+
+with col2:
+    st.markdown(
+        "La déforestation est également  un facteur majeur d’augmentation des émissions de gaz à effet de serre."
+    )
+    st.markdown(
+        "En détruisant les forêts, notamment pour l’agriculture, l’élevage ou l’exploitation du bois, on réduit la capacité de la planète à absorber le CO₂, principal gaz responsable du réchauffement climatique. De plus, la combustion et la décomposition des arbres libèrent directement du dioxyde de carbone dans l’atmosphère."
+    )
+
 
 dataset_co2 = get_dataset("annual-co2-including-land-use")
 dataset_forest = get_dataset("tree-cover-loss")
