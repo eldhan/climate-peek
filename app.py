@@ -1,5 +1,4 @@
 import streamlit as st
-from functions import check_datasets
 
 
 def load_css(file_name: str) -> None:

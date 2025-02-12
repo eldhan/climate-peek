@@ -246,9 +246,18 @@ def check_datasets(datasets: list) -> None:
                 os.remove(f"datasets/{file}")
         # update all datasets
         f = open(f"datasets/{check_result}.txt", "a")
+        progress_text = "Les données sont en cours de chargement, veuillez patienter"
+        progress = 0
+        my_bar = st.progress(progress, text=progress_text)
+        step = round(len(datasets) / 100, 2)
         for dataset in datasets:
             update_dataset(dataset, f.name)
+            progress += step
+            if progress > 1.0:
+                progress = 1.0
+            my_bar.progress(progress, text=progress_text)
         f.close()
+        my_bar.empty()
 
 
 def get_dataset(dataset_name: str) -> str:
