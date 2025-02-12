@@ -5,7 +5,11 @@ import pandas as pd
 from functions import get_dataset
 
 
-st.header("Les impacts du changement climatique")
+st.header("Les impacts terrestres du changement climatique")
+
+st.markdown(
+    "L’augmentation des émissions de GES a d’énormes conséquences sur la planète, notamment au niveau du climat."
+)
 # DATA PREPARATION
 # Load datasets required for graph comparisons
 dataset_temperature = get_dataset("annual-temperature-anomalies")
@@ -37,11 +41,23 @@ if (
     df1 = df[df["Entity"] == "World"]
 
     # PAGE DISPLAY
-    on = st.toggle("Comparer deux zones")
 
-    st.subheader(
-        "Corrélation entre les anomalies de température dans l'atmosphère et de précipitations et les émissions de CO² dans le monde"
-    )
+    st.subheader("Les anomalies de température et de précipitations")
+
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.markdown(
+            """
+        Les anomalies au niveau des températures et des précipitations augmentent de plus en plus, suivant la courbe de croissance des émissions de CO2. On l’a dit, les températures mondiales augmentent à cause de l’effet de serre qui s’intensifie. L’air étant plus chaud, il contient plus d’humidité, faisant s’accroître les pluies.
+        """
+        )
+
+    with col2:
+
+        st.image("assets/innondation.jpg")
+
+    on = st.toggle("Comparer deux zones")
 
     if not on:
         df_filter = st.selectbox(
@@ -55,6 +71,7 @@ if (
                     x=df0["Year"],
                     y=df0["Temperature anomaly"],
                     name="anomalies de température (degrés)",
+                    line=dict(color="red"),
                 ),
                 secondary_y=False,
             )
@@ -63,6 +80,7 @@ if (
                     x=df0["Year"],
                     y=df0["Annual precipitation anomaly"] / 100,
                     name="anomalies de précipitations (cm)",
+                    line=dict(color="orange"),
                 ),
                 secondary_y=False,
             )
@@ -71,7 +89,7 @@ if (
                     x=df1["Year"],
                     y=df1["Annual CO₂ emissions including land-use change"],
                     name="émissions de co² dans le monde (milliards de tonnes)",
-                    line=dict(color="red"),
+                    line=dict(color="blue"),
                 ),
                 secondary_y=True,
             )
@@ -93,6 +111,7 @@ if (
                         x=df2["Year"],
                         y=df2["Temperature anomaly"],
                         name="anomalies de température (degrés)",
+                        line=dict(color="red"),
                     ),
                     secondary_y=False,
                 )
@@ -101,6 +120,7 @@ if (
                         x=df2["Year"],
                         y=df2["Annual precipitation anomaly"] / 100,
                         name="anomalies de précipitations (cm)",
+                        line=dict(color="orange"),
                     ),
                     secondary_y=False,
                 )
@@ -109,7 +129,7 @@ if (
                         x=df1["Year"],
                         y=df1["Annual CO₂ emissions including land-use change"],
                         name="émissions de co² dans le monde (milliards de tonnes)",
-                        line=dict(color="red"),
+                        line=dict(color="blue"),
                     ),
                     secondary_y=True,
                 )
@@ -129,6 +149,7 @@ if (
                         x=df2["Year"],
                         y=df2["Temperature anomaly"],
                         name="anomalies de température (degrés)",
+                        line=dict(color="red"),
                     ),
                     secondary_y=False,
                 )
@@ -137,6 +158,7 @@ if (
                         x=df2["Year"],
                         y=df2["Annual precipitation anomaly"] / 100,
                         name="anomalies de précipitations (cm)",
+                        line=dict(color="orange"),
                     ),
                     secondary_y=False,
                 )
@@ -145,7 +167,7 @@ if (
                         x=df1["Year"],
                         y=df1["Annual CO₂ emissions including land-use change"],
                         name="émissions de co² dans le monde (milliards de tonnes)",
-                        line=dict(color="red"),
+                        line=dict(color="blue"),
                     ),
                     secondary_y=True,
                 )
@@ -173,7 +195,19 @@ if dataset_disasters != "error":
         | (df2["Entity"] == "Extreme weather")
     ]
 
-    st.subheader("Les évènements climatiques extrêmes vs les émissions de CO²")
+    st.subheader("Les évènements climatiques extrêmes")
+
+    col1, col2 = st.columns([1, 2])
+
+    with col1:
+        st.image("assets/innondation.jpg")
+
+    with col2:
+        st.markdown(
+            """
+        Ce dérèglement des températures et des précipitations dû à l’augmentation de l’effet de serre provoque une augmentation des évènements climatiques extrêmes comme les sécheresses, les inondations ou encore les cyclones.
+        """
+        )
 
     df_filter = st.selectbox(
         label="Sélectionnez un évènement climatique : ",
@@ -217,176 +251,21 @@ else:
 # Ajouter un espace entre les paragraphes
 st.markdown("<br><br>", unsafe_allow_html=True)
 
-# MONTEE DES EAUX
-st.subheader("La montée du niveau des océans")
-
-dataset_sea_levels = get_dataset("sea-level")
-if dataset_sea_levels != "error":
-    df3 = pd.read_csv(f"datasets/{dataset_sea_levels}")
-    df3["Day"] = pd.to_datetime(df3["Day"])
-    df3["Year"] = df3["Day"].dt.year
-    df3 = df3.drop_duplicates(subset="Year", keep="last")
-
-    # Create figure with secondary y-axis
-    fig2 = make_subplots(specs=[[{"secondary_y": True}]])
-
-    # Add traces
-    fig2.add_trace(
-        go.Scatter(
-            x=df_co2["Year"],
-            y=df_co2["Annual CO₂ emissions including land-use change"],
-            name="émissions de co² mondiales",
-            line=dict(color="blue"),
-        ),
-        secondary_y=False,
-    )
-
-    fig2.add_trace(
-        go.Scatter(
-            x=df3["Year"],
-            y=df3[
-                "Global sea level as an average of Church and White (2011) and UHSLC data"
-            ],
-            name="niveau des océans",
-            line=dict(color="red"),
-        ),
-        secondary_y=True,
-    )
-
-    # Add figure title
-    fig2.update_layout(
-        title_text="Évolution du niveau moyen des océans vs les émissions de CO² mondiales",
-        legend=dict(orientation="h", y=-0.2),
-    )
-
-    # Set x-axis title
-    fig2.update_xaxes(title_text="Année")
-
-    # Set y-axes titles
-    fig2.update_yaxes(title_text="émissions de CO2", secondary_y=False)
-    fig2.update_yaxes(title_text="niveau des océans", secondary_y=True)
-
-    st.plotly_chart(fig2)
-else:
-    st.write("Une erreur a été rencontré.")
-
-# Ajouter un espace entre les paragraphes
-st.markdown("<br><br>", unsafe_allow_html=True)
-
-# TEMPERATURE DES OCEANS
-st.subheader("L'augmentation de la température des océans")
-dataset_sea_surface = get_dataset("sea-surface-temperature-anomaly")
-if dataset_sea_surface != "error":
-    # on transforme les dates en années
-    df4 = pd.read_csv(f"datasets/{dataset_sea_surface}")
-
-    # supprimer la virgule dans l'année
-    # df4['Year'] = df4['Year'] = df4['Year'].astype(str).str.replace(',', '').astype(int)
-    df4 = df4[df4["Entity"] == "Global"]
-
-    # Create figure with secondary y-axis
-    fig3 = make_subplots(specs=[[{"secondary_y": True}]])
-
-    # Add traces
-    fig3.add_trace(
-        go.Scatter(
-            x=df_co2["Year"],
-            y=df_co2["Annual CO₂ emissions including land-use change"],
-            name="émissions de co² mondiales",
-            line=dict(color="blue"),
-        ),
-        secondary_y=False,
-    )
-
-    fig3.add_trace(
-        go.Scatter(
-            x=df4["Year"],
-            y=df4["Sea surface temperature anomaly (relative to 1961-90 average)"],
-            name="anomalies de températures",
-            line=dict(color="red"),
-        ),
-        secondary_y=True,
-    )
-
-    # Add figure title
-    fig3.update_layout(
-        title_text="Évolution de la température moyenne des océans vs les émissions de CO² mondiales",
-        legend=dict(orientation="h", y=-0.2),
-    )
-
-    # Set x-axis title
-    fig3.update_xaxes(title_text="Année")
-
-    # Set y-axes titles
-    fig3.update_yaxes(title_text="émissions de CO2", secondary_y=False)
-    fig3.update_yaxes(title_text="température moyenne des océans", secondary_y=True)
-
-    st.plotly_chart(fig3)
-else:
-    st.write("Une erreur a été rencontré.")
-
-# Ajouter un espace entre les paragraphes
-st.markdown("<br><br>", unsafe_allow_html=True)
-
-# ACIFIFICATION
-st.subheader("L'acidification des océans")
-dataset_seawaterph = get_dataset("seawater-ph")
-if dataset_seawaterph != "error":
-    df5 = pd.read_csv(f"datasets/{dataset_seawaterph}")
-
-    # on transforme les dates en années
-    df5["Day"] = pd.to_datetime(df5["Day"])
-    df5["Year"] = df5["Day"].dt.year
-    df5 = df5.drop_duplicates(subset="Year", keep="last")
-
-    df_co2 = df_co2.drop(df_co2[df_co2["Year"] < 1988].index)
-
-    # Create figure with secondary y-axis
-    fig4 = make_subplots(specs=[[{"secondary_y": True}]])
-
-    # Add traces
-    fig4.add_trace(
-        go.Scatter(
-            x=df_co2["Year"],
-            y=df_co2["Annual CO₂ emissions including land-use change"],
-            name="émissions de co² mondiales",
-            line=dict(color="blue"),
-        ),
-        secondary_y=False,
-    )
-
-    fig4.add_trace(
-        go.Scatter(
-            x=df5["Year"],
-            y=df5["Rolling yearly average of ocean pH levels"],
-            name="pH moyen annuel",
-            line=dict(color="red"),
-        ),
-        secondary_y=True,
-    )
-
-    # Add figure title
-    fig4.update_layout(
-        title_text="Évolution du ph moyen annuel de l'océan à Hawaï vs les émissions de CO² mondiales",
-        legend=dict(orientation="h", y=-0.2),
-    )
-
-    # Set x-axis title
-    fig4.update_xaxes(title_text="Année")
-
-    # Set y-axes titles
-    fig4.update_yaxes(title_text="émissions de CO2", secondary_y=False)
-    fig4.update_yaxes(title_text="pH des océans", secondary_y=True)
-
-    st.plotly_chart(fig4)
-else:
-    st.write("Une erreur a été rencontré.")
-
-# Ajouter un espace entre les paragraphes
-st.markdown("<br><br>", unsafe_allow_html=True)
-
 # FONTE DES GLACES
 st.subheader("La fonte des glaces")
+
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.markdown(
+        """
+    On parle de fonte des glaces pour désigner l’accélération rapide de la disparition des glaciers durant les dernières décennies. Avec le réchauffement climatique, les glaces fondent de plus en plus tôt (trois fois plus rapidement qu’avant) et ont de plus en plus de mal à se reformer en hiver. Selon certaines études, plus de 28 000 tonnes de glaces ont disparu depuis 1994.
+    """
+    )
+
+with col2:
+
+    st.image("assets/glace.jpg")
 
 dataset_icesheet = get_dataset("ice-sheet-mass-balance")
 if dataset_icesheet != "error":

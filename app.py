@@ -16,15 +16,22 @@ climate_change = st.Page(
 
 change_evidence = st.Page(
     page="change_evidence.py",
-    title="Indicateurs du changement",
+    title="Causes du changement",
     url_path="change-evidence",
     default=False,
 )
 
-change_impact = st.Page(
-    page="change_impact.py",
-    title="Impact du changement",
-    url_path="change-impact",
+change_impact_terre = st.Page(
+    page="change_impact_terre.py",
+    title="Impacts terrestres",
+    url_path="change-impact_terre",
+    default=False,
+)
+
+change_impact_ocean = st.Page(
+    page="change_impact_ocean.py",
+    title="Impacts océaniques",
+    url_path="change-impact_ocean",
     default=False,
 )
 
@@ -38,7 +45,16 @@ today = st.Page(
 # Define the navigation
 st.set_page_config(layout="wide")
 with st.sidebar:
-    pg = st.navigation([climate_change, change_evidence, change_impact, today])
+    st.image("assets/climate_peek.webp")
+    pg = st.navigation(
+        [
+            climate_change,
+            change_evidence,
+            change_impact_terre,
+            change_impact_ocean,
+            today,
+        ]
+    )
 # Apply css
 css = "assets/style.css"
 load_css(css)
@@ -54,7 +70,7 @@ DATASETS = [
     "sea-surface-temperature-anomaly",
     "seawater-ph",
     "total-ghg-emissions",
-    "tree-cover-loss"
+    "tree-cover-loss",
 ]
 check_datasets(DATASETS)
 # Start the app
