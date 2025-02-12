@@ -7,7 +7,7 @@ Le but de ce projet est d'analyser l'impact du changement climatique sur les con
 
 ## Lancer le projet localement
 
-Saisir dans un terminal la commande suivante :
+Saisir dans un terminal les commandes suivantes pour installer les paquets requis et lancer l'application Streamlit:
 
     streamlit run app.py
 
