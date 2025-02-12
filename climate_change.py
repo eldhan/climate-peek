@@ -1,7 +1,8 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from functions import get_dataset
+from functions import get_dataset, check_datasets
+
 
 
 with open("assets/style.css") as f:
@@ -29,6 +30,21 @@ with col2:
     st.image("assets/climate_peek_intro.jpg")
 
 # DATA PREPARATION
+# List of datasets
+DATASETS = [
+    "total-ghg-emissions",
+    "annual-co2-including-land-use",
+    "annual-temperature-anomalies",
+    "global-precipitation-anomaly",
+    "number-of-natural-disaster-events",
+    "global-warming-by-gas-and-source",
+    "ice-sheet-mass-balance",
+    "sea-level",
+    "sea-surface-temperature-anomaly",
+    "seawater-ph",
+    "tree-cover-loss",
+]
+check_datasets(DATASETS)
 # Load dataset
 dataset_ghg = get_dataset("total-ghg-emissions")
 if dataset_ghg != "error":
