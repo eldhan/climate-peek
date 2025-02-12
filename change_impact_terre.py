@@ -205,6 +205,16 @@ if dataset_disasters != "error" and dataset_co2 != "error":
         | (df2["Entity"] == "Extreme weather")
     ]
 
+    df2["Entity"] = df2["Entity"].replace(
+    {
+        "Flood": "Inondations",
+        "Drought": "Sécheresse",
+        "Wildfire": "Feux de forêt",
+        "Extreme temperature": "Températures extrêmes",
+        "Extreme weather": "Climat extrême",
+    }
+)
+
     st.subheader("Les évènements climatiques extrêmes")
 
     col1, col2 = st.columns([1, 2])
