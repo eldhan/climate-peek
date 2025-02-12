@@ -4,6 +4,7 @@ from urllib import error
 import os
 import re
 from datetime import datetime
+import streamlit as st
 
 
 def fetch_dataset(
@@ -90,7 +91,7 @@ def fetch_dataset_metadata(
         return metadata_json
 
 
-def update_dataset(dataset_name: str) -> bool:
+def update_dataset(dataset_name: str, filename: str) -> bool:
     """
     Check if there is a new version of a dataset and import it.
 
@@ -98,44 +99,108 @@ def update_dataset(dataset_name: str) -> bool:
     ----------
     dataset_name : str
         the name of the dataset to fetch.
+    filename :
+        the name of the log file
 
     Returns:
     ----------
     : bool
         True if succes or False if error encountered
     """
+    # Create log list
+    log = []
+    log.append(
+        f"Starting update for {dataset_name} at {datetime.today().strftime("%Y-%m-%d-%H-%M")} \n"
+    )
     # Get the date of the dataset last update
     metadata = fetch_dataset_metadata(dataset_name)
+    log.append(
+        f"1. Fetch metadata : {metadata if metadata is "error" else "success"}\n"
+    )
     column_name = list(metadata["columns"].keys())[0]
     if metadata != "error":
         if "lastUpdated" in metadata["columns"][column_name]:
             last_updated = metadata["columns"][column_name]["lastUpdated"]
         else:
             last_updated = metadata["dateDownloaded"]
+        log.append(f"2. Date of last WID update: {last_updated}\n")
         # Parse the datasets folder
         datasets_list = os.scandir("datasets")
+        today = datetime.today().strftime("%Y-%m-%d")
+        dataset_exists = False
         for dataset in datasets_list:
             # Check if we already have an existing dataset and get its update date
             if dataset_name in dataset.name:
+                dataset_exists = True
+                log.append(f"3. Found existing dataset : {dataset.name}\n")
                 dataset_update_date = re.search(r"\d{4}-\d{2}-\d{2}", dataset.name)
-                if dataset_update_date is not None:
+                if isinstance(dataset_update_date, re.Match):
                     dataset_update_date = dataset_update_date[0]
+                else:
+                    dataset_update_date = today
+                log.append(
+                    f"4a. Date the dataset was last updated : {dataset_update_date}\n"
+                )
+        # if the dataset does not exist:
+        if dataset_exists is False:
+            dataset_update_date = today
         # if the existing dataset is not the most recent, get the new one
-        if dataset_update_date is None or dataset_update_date < last_updated:
+        success = False
+        if dataset_exists is True:
+            if dataset_update_date > last_updated or (
+                dataset_update_date == last_updated == today
+            ):
+                df = fetch_dataset(dataset_name)
+                log.append(f"5. Fetch dataset : {df if df is "error" else "success"}\n")
+                if df is not "error":
+                    # Create a new CSV with the freshest data
+                    dataset_new_name = f"{dataset_name}-{last_updated}"
+                    log.append(
+                        f"6. Create new file for updated dataset {dataset_new_name}\n"
+                    )
+                    df.to_csv(
+                        path_or_buf=f"datasets/{dataset_new_name}.csv",
+                        index=False,
+                    )
+                    for dataset in datasets_list:
+                        if dataset_new_name in dataset.name:
+                            log.append(
+                                f"7. New dataset file successfully created {dataset.name}\n"
+                            )
+                    # Delete the old dataset if it exists
+                    if os.path.exists(
+                        f"datasets/{dataset_name}-{dataset_update_date}.csv"
+                    ):
+                        os.remove(f"datasets/{dataset_name}-{dataset_update_date}.csv")
+                        log.append(
+                            f"8. Deleted datasets/{dataset_name}-{dataset_update_date}.csv\n"
+                        )
+                    elif os.path.exists(f"datasets/{dataset_name}.csv"):
+                        os.remove(f"datasets/{dataset_name}.csv")
+                        log.append(f"9. Deleted datasets/{dataset_name}.csv\n")
+                    success = True
+        elif dataset_exists is False:
             df = fetch_dataset(dataset_name)
+            log.append(f"5. Fetch dataset : {df if df is "error" else "success"}\n")
             if df is not "error":
                 # Create a new CSV with the freshest data
+                dataset_new_name = f"{dataset_name}-{last_updated}"
+                log.append(f"6. Import new dataset {dataset_new_name}\n")
                 df.to_csv(
-                    path_or_buf=f"datasets/{dataset_name}-{last_updated}.csv",
+                    path_or_buf=f"datasets/{dataset_new_name}.csv",
                     index=False,
                 )
-                # Delete the old dataset if it exists
-                if os.path.exists(f"datasets/{dataset_name}-{dataset_update_date}.csv"):
-                    os.remove(f"datasets/{dataset_name}-{dataset_update_date}.csv")
-                elif os.path.exists(f"datasets/{dataset_name}.csv"):
-                    os.remove(f"datasets/{dataset_name}.csv")
-                return True
-        return False
+                for dataset in datasets_list:
+                    if dataset_new_name in dataset.name:
+                        log.append(
+                            f"7. New dataset file successfully created {dataset.name}\n"
+                        )
+                success = True
+    logs = open(filename, "a")
+    logs.write(str(log))
+    logs.close()
+    if success:
+        return True
     else:
         return False
 
@@ -180,15 +245,19 @@ def check_datasets(datasets: list) -> None:
             if file.endswith(".txt"):
                 os.remove(f"datasets/{file}")
         # update all datasets
-        results = []
-        for dataset in datasets:
-            result = update_dataset(dataset)
-            if result:
-                results.append(result)
-        # Create the file for today
         f = open(f"datasets/{check_result}.txt", "a")
-        f.write(str(results))
+        progress_text = "Les données sont en cours de chargement, veuillez patienter"
+        progress = 0
+        my_bar = st.progress(progress, text=progress_text)
+        step = round(len(datasets) / 100, 2)
+        for dataset in datasets:
+            update_dataset(dataset, f.name)
+            progress += step
+            if progress > 1.0:
+                progress = 1.0
+            my_bar.progress(progress, text=progress_text)
         f.close()
+        my_bar.empty()
 
 
 def get_dataset(dataset_name: str) -> str:

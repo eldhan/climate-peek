@@ -33,6 +33,7 @@ with col2:
 dataset_ghg = get_dataset("total-ghg-emissions")
 if dataset_ghg != "error":
     df = pd.read_csv(f"datasets/{dataset_ghg}")
+    # DATA PREPARATION
     # Sort dataset by year to correctly animate the graph
     df = df.sort_values(by="Year", ascending=True)
     # Remove aggregated categories from the dataframe
@@ -50,7 +51,8 @@ if dataset_ghg != "error":
         projection="natural earth",
         title="Émissions GES",
         labels={
-            "Annual greenhouse gas emissions in CO₂ equivalents": "Émissions GES (équivalent CO₂)"
+            "Annual greenhouse gas emissions in CO₂ equivalents": "Émissions GES (équivalent CO₂)",
+            "Year": "Année",
         },
         animation_frame="Year",
     )

@@ -3,6 +3,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 from functions import get_dataset
+import pycountry
+import gettext
 
 
 st.header("Les impacts terrestres du changement climatique")
@@ -32,13 +34,20 @@ if (
         on=["Entity", "Code", "Year"],
     )
     df = pd.merge(df_anomalies, df_co2, how="inner", on=["Entity", "Code", "Year"])
+    country_translation = {}
+    french = gettext.translation("iso3166-1", pycountry.LOCALES_DIR, languages=["fr"])
+    french.install()
+    for country in pycountry.countries:
+        country_translation[country.name] = _(country.name)
 
+    df["Entity_FR"] = df["Entity"].map(country_translation).fillna(df["Entity"])
+    df["Entity_FR"] = df["Entity_FR"].replace(to_replace={"World": "Monde", "North Korea": "Corée du Nord", "Democratic Republic of Congo": "République démocratique du Congo"})
     # Prepare filters
-    filter_options = df["Entity"].drop_duplicates()
+    filter_options = df["Entity_FR"].drop_duplicates()
     world_index = 175
 
     # Dataframe for world values only
-    df1 = df[df["Entity"] == "World"]
+    df1 = df[df["Entity_FR"] == "Monde"]
 
     # PAGE DISPLAY
 
@@ -64,7 +73,7 @@ if (
             label="Sélectionnez un filtre : ", options=filter_options, index=world_index
         )
         if df_filter:
-            df0 = df[df["Entity"] == df_filter]
+            df0 = df[df["Entity_FR"] == df_filter]
             fig = make_subplots(specs=[[{"secondary_y": True}]])
             fig.add_trace(
                 go.Scatter(
@@ -104,7 +113,7 @@ if (
                 index=world_index,
             )
             if df_filter:
-                df2 = df[df["Entity"] == df_filter]
+                df2 = df[df["Entity_FR"] == df_filter]
                 fig = make_subplots(specs=[[{"secondary_y": True}]])
                 fig.add_trace(
                     go.Scatter(
@@ -142,7 +151,7 @@ if (
             )
 
             if df_filter:
-                df2 = df[df["Entity"] == df_filter]
+                df2 = df[df["Entity_FR"] == df_filter]
                 fig = make_subplots(specs=[[{"secondary_y": True}]])
                 fig.add_trace(
                     go.Scatter(
@@ -176,11 +185,12 @@ if (
 else:
     st.write("Une erreur a été rencontré")
     # Ajouter un espace entre les paragraphes
-st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<br><br>", unsafe_allow_html=True) 
 
+st.subheader("Les évènements climatiques extrêmes vs les émissions de CO²")
 # Load dataset
 dataset_disasters = get_dataset("number-of-natural-disaster-events")
-if dataset_disasters != "error":
+if dataset_disasters != "error" and dataset_co2 != "error":
     df2 = pd.read_csv(f"datasets/{dataset_disasters}")
 
     # Remove aggregated categories from the dataframe
@@ -268,7 +278,7 @@ with col2:
     st.image("assets/glace.jpg")
 
 dataset_icesheet = get_dataset("ice-sheet-mass-balance")
-if dataset_icesheet != "error":
+if dataset_icesheet != "error" and dataset_co2 != "error":
     df6 = pd.read_csv(f"datasets/{dataset_icesheet}")
 
     # on transforme les dates en années
