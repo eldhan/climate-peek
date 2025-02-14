@@ -2,44 +2,9 @@ import streamlit as st
 import requests
 from datetime import datetime
 import pytz
-from bs4 import BeautifulSoup
 import re
 import pandas as pd
-from helium import start_firefox, click, kill_browser
 
-
-def format_data(txt):
-    if txt == "n/a":
-        return "Pas de Données"
-    else:
-        return re.sub(
-            r"([\d.]+ ppm) increase (\([\d.]+ %\)) *", r"Augmentation de \1 \2", txt
-        )
-
-
-def translate_no_data_fr(txt):
-    if txt == "Unavailable":
-        return "Pas de données"
-    else:
-        return txt
-
-
-def dateuh(dat3):
-    dat3 = datetime.strptime(dat3, "%b. %d, %Y")
-    m0is = months[dat3.strftime("%b")]
-    dat3 = f"{dat3.day} {m0is} {dat3.year}"
-    return dat3
-
-
-# Initialize session states
-if "data_retrieved" not in st.session_state:
-    st.session_state.data_retrieved = False
-    st.session_state.date = False
-    st.session_state.date = False
-    st.session_state.change = False
-    st.session_state.tableppm = False
-    st.session_state.ppm = False
-    st.session_state.tabledate = False
 
 months = {
     "Jan": "janvier",
@@ -128,47 +93,24 @@ with col1:
                 temperatures.append(celsius_degree2)
 
         st.write(pd.DataFrame({"Date": dates, "Temperature": temperatures}))
+    else:
+        st.write("Veuillez sélectionner une ville.")
 
 with col2:
     st.markdown("#### Concentration en CO2")
-    if st.session_state.data_retrieved is False:
-        url = start_firefox("https://www.co2.earth/daily-co2", headless=True)
-        click("6 Decades")
-        page_source = url.page_source
-        soup = BeautifulSoup(page_source, "html.parser")
-        tab = soup.find("div", {"id": "DecadeDailyPanel"})
-        kill_browser()
-
-        date = re.search(r"<td><span>(.*)</span> </td>", str(tab)).group(1)
-        date = datetime.strptime(date, "%b. %d, %Y")
-        month = months[date.strftime("%b")]
-        ppm = re.search(r'<td class="alt-col"><span>(.*)</span></td>', str(tab)).group(
-            1
+    if st.session_state.data_retrieved == True:
+        st.write(f"{st.session_state.date} | {st.session_state.ppm}")
+        st.write(
+            pd.DataFrame(
+                {
+                    "Date": st.session_state.tabledate,
+                    "PPM": st.session_state.tableppm,
+                    "augmentation": st.session_state.change,
+                }
+            )
         )
-        tabledate = re.findall(r"<td>(\w{3}\.\s\d+\,\s\d+)</td>", str(tab))
-        tableppm = re.findall(
-            r'<td class="alt-col">(\d{3}\..+|Unavailable)</td>', str(tab)
-        )
-        change = re.findall(r"<td><span class=.*>(.*) </span></td>", str(tab))
-        change = change[1:]
-
-        st.session_state.date = f"{date.day} {month} {date.year}"
-        st.session_state.change = [format_data(txt) for txt in change]
-        st.session_state.tableppm = [translate_no_data_fr(txt) for txt in tableppm]
-        st.session_state.ppm = translate_no_data_fr(ppm)
-        st.session_state.tabledate = [dateuh(dat3) for dat3 in tabledate]
-        st.session_state.data_retrieved = True
-
-    st.write(f"{st.session_state.date} | {st.session_state.ppm}")
-    st.write(
-        pd.DataFrame(
-            {
-                "Date": st.session_state.tabledate,
-                "PPM": st.session_state.tableppm,
-                "augmentation": st.session_state.change,
-            }
-        )
-    )
+    else: 
+        st.write("Erreur")
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("#### Les prédictions jusqu'en 2100")

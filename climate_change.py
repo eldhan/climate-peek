@@ -76,3 +76,88 @@ if dataset_ghg != "error":
     st.plotly_chart(fig, use_container_width=True)
 else:
     st.write("Une erreur a été rencontré")
+
+# Préchargement du webscrapping helium pour la page today
+
+import requests
+from datetime import datetime
+import pytz
+from bs4 import BeautifulSoup
+import re
+from helium import start_firefox, click, kill_browser
+
+def format_data(txt):
+    if txt == "n/a":
+        return "Pas de Données"
+    else:
+        return re.sub(
+            r"([\d.]+ ppm) increase (\([\d.]+ %\)) *", r"Augmentation de \1 \2", txt
+        )
+
+
+def translate_no_data_fr(txt):
+    if txt == "Unavailable":
+        return "Pas de données"
+    else:
+        return txt
+
+
+def format_date_table(table_date):
+    table_date = datetime.strptime(table_date, "%b. %d, %Y")
+    table_months = months[table_date.strftime("%b")]
+    table_date = f"{table_date.day} {table_months} {table_date.year}"
+    return table_date
+
+
+months = {
+    "Jan": "janvier",
+    "Feb": "février",
+    "Mar": "mars",
+    "Apr": "avril",
+    "May": "mai",
+    "Jun": "juin",
+    "Jul": "juillet",
+    "Aug": "août",
+    "Sep": "septembre",
+    "Oct": "octobre",
+    "Nov": "novembre",
+    "Dec": "décembre",
+}
+
+# Initialize session states
+if "data_retrieved" not in st.session_state:
+    st.session_state.data_retrieved = False
+    st.session_state.date = False
+    st.session_state.tabledate = False
+    st.session_state.change = False
+    st.session_state.tableppm = False
+    st.session_state.ppm = False
+
+
+if st.session_state.data_retrieved is False:
+    url = start_firefox("https://www.co2.earth/daily-co2", headless=True)
+    click("6 Decades")
+    page_source = url.page_source
+    soup = BeautifulSoup(page_source, "html.parser")
+    tab = soup.find("div", {"id": "DecadeDailyPanel"})
+    kill_browser()
+
+    date = re.search(r"<td><span>(.*)</span> </td>", str(tab)).group(1)
+    date = datetime.strptime(date, "%b. %d, %Y")
+    month = months[date.strftime("%b")]
+    ppm = re.search(r'<td class="alt-col"><span>(.*)</span></td>', str(tab)).group(
+        1
+    )
+    tabledate = re.findall(r"<td>(\w{3}\.\s\d+\,\s\d+)</td>", str(tab))
+    tableppm = re.findall(
+        r'<td class="alt-col">(\d{3}\..+|Unavailable)</td>', str(tab)
+    )
+    change = re.findall(r"<td><span class=.*>(.*) </span></td>", str(tab))
+    change = change[1:]
+
+    st.session_state.date = f"{date.day} {month} {date.year}"
+    st.session_state.change = [format_data(txt) for txt in change]
+    st.session_state.tableppm = [translate_no_data_fr(txt) for txt in tableppm]
+    st.session_state.ppm = translate_no_data_fr(ppm)
+    st.session_state.tabledate = [format_date_table(table_date) for table_date in tabledate]
+    st.session_state.data_retrieved = True

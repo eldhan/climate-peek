@@ -151,8 +151,8 @@ if (
                 label="Sélectionnez un filtre : ", options=filter_options, key="filter2"
             )
 
-            if df_filter:
-                df2 = df[df["Entity_FR"] == df_filter]
+            if df_filter2:
+                df2 = df[df["Entity_FR"] == df_filter2]
                 fig = make_subplots(specs=[[{"secondary_y": True}]])
                 fig.add_trace(
                     go.Scatter(
