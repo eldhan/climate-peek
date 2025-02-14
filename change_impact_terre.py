@@ -41,7 +41,13 @@ if (
         country_translation[country.name] = _(country.name)
 
     df["Entity_FR"] = df["Entity"].map(country_translation).fillna(df["Entity"])
-    df["Entity_FR"] = df["Entity_FR"].replace(to_replace={"World": "Monde", "North Korea": "Corée du Nord", "Democratic Republic of Congo": "République démocratique du Congo"})
+    df["Entity_FR"] = df["Entity_FR"].replace(
+        to_replace={
+            "World": "Monde",
+            "North Korea": "Corée du Nord",
+            "Democratic Republic of Congo": "République démocratique du Congo",
+        }
+    )
     # Prepare filters
     filter_options = df["Entity_FR"].drop_duplicates()
     world_index = 175
@@ -103,7 +109,9 @@ if (
                 secondary_y=True,
             )
             fig.update_layout(legend=dict(orientation="h", y=-0.2))
-            fig.update_layout(title= "Corrélation entre les émissions de CO₂ et les anomalies")
+            fig.update_layout(
+                title="Corrélation entre les émissions de CO₂ et les anomalies"
+            )
             st.plotly_chart(fig)
     else:
         col1, col2 = st.columns(2)
@@ -186,7 +194,7 @@ if (
 else:
     st.write("Une erreur a été rencontré")
     # Ajouter un espace entre les paragraphes
-st.markdown("<br><br>", unsafe_allow_html=True) 
+st.markdown("<br><br>", unsafe_allow_html=True)
 
 # Load dataset
 dataset_disasters = get_dataset("number-of-natural-disaster-events")
@@ -206,21 +214,21 @@ if dataset_disasters != "error" and dataset_co2 != "error":
     ]
 
     df2["Entity"] = df2["Entity"].replace(
-    {
-        "Flood": "Inondations",
-        "Drought": "Sécheresse",
-        "Wildfire": "Feux de forêt",
-        "Extreme temperature": "Températures extrêmes",
-        "Extreme weather": "Climat extrême",
-    }
-)
+        {
+            "Flood": "Inondations",
+            "Drought": "Sécheresse",
+            "Wildfire": "Feux de forêt",
+            "Extreme temperature": "Températures extrêmes",
+            "Extreme weather": "Climat extrême",
+        }
+    )
 
     st.subheader("Les évènements climatiques extrêmes")
 
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.image("assets/innondation.jpg")
+        st.image("assets/fire.jpg")
 
     with col2:
         st.markdown(

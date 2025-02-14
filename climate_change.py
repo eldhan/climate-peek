@@ -4,10 +4,6 @@ import pandas as pd
 from functions import get_dataset, check_datasets
 
 
-
-with open("assets/style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
 st.markdown("# Climate Peek")
 st.markdown("### Un aperçu du changement climatique")
 st.markdown("<br>", unsafe_allow_html=True)
