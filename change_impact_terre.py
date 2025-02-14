@@ -103,6 +103,7 @@ if (
                 secondary_y=True,
             )
             fig.update_layout(legend=dict(orientation="h", y=-0.2))
+            fig.update_layout(title= "Corrélation entre les émissions de CO₂ et les anomalies")
             st.plotly_chart(fig)
     else:
         col1, col2 = st.columns(2)
@@ -187,7 +188,6 @@ else:
     # Ajouter un espace entre les paragraphes
 st.markdown("<br><br>", unsafe_allow_html=True) 
 
-st.subheader("Les évènements climatiques extrêmes vs les émissions de CO²")
 # Load dataset
 dataset_disasters = get_dataset("number-of-natural-disaster-events")
 if dataset_disasters != "error" and dataset_co2 != "error":
